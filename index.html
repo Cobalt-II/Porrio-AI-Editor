@@ -333,6 +333,7 @@ requestAnimationFrame(function draw() {
                             ]);
                         }
                     };
+                    // Again, this if wrapper is not needed, but I just do it because I like it.
                     if (targets.length) {
                         let targ = targets.reduce((dist, dist2) => dist[1] < dist2[1] ? dist[0] : dist2[0]);
                         if (targ.length === 2) {
