@@ -213,8 +213,8 @@ requestAnimationFrame(function draw() {
             weapons[coun].x = r[0];
             weapons[coun].y = r[1];
             weapons[coun].rotation += weapons[coun].rotspeed;
-            if (weapons[coun].rotation % 360 === 0) {
-                weapons[coun].rotation = 0;
+            if (weapons[coun].rotation > 360) {
+                weapons[coun].rotation = weapons[coun].rotation - 360
             };
             ctx.fillStyle = '#ffe46b';
             if (weapons[coun].health > 0) {
