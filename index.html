@@ -57,7 +57,7 @@ class Smasher {
 enemies.push(new Smasher(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
 the Smasher (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
 instead of making a Smasher through the enemy class. Dummy players come after.*/
-enemies.push(new Enemy('Smasher', 500, 100, 100, 200, 0.75, [20, 20], 1, 500, 0.001));
+enemies.push(new Enemy('Smasher', 1000, 100, 100, 200, 0.75, [20, 20], 1, 1000, 0.001));
 let walls = [];
 // Generate some walls with the Wall class.
 class Wall {
@@ -80,7 +80,7 @@ you can make your own too. Damage is weapon body damage, model is model, rotatio
 rotspeed is the rotational speed, and target is the players[target] that you want to the weapon to apply to. */
 let weapons = [];
 class Weapon {
-    constructor(dmg, model, rotation, x, y, rotspeed, target) {
+    constructor(dmg, model, rotation, x, y, rotspeed, target, health, recharge) {
         this.dmg = dmg;
         this.model = model;
         this.rotation = rotation;
@@ -88,6 +88,9 @@ class Weapon {
         this.y = y;
         this.rotspeed = rotspeed;
         this.target = target;
+        this.health = health;
+        this.maxhealth = health;
+        this.recharge = recharge;
     }
 };
 /* Added this so you can test enemy targetting on multiple players, these don't move or anything (except for yours), 
@@ -113,11 +116,11 @@ let maxhealth = hp;
 let rgn = 0.001;
 /* game calculates by always pushing your player data first, so that it can refer in its 
 calculations to you as players[0] */
-players.push(new Player(hp, x, y, [w, h], body, maxhealth, rgn), new Player(100, 75, 75, [10, 10], 4, 100, 0.001));
+players.push(new Player(hp, x, y, [w, h], body, maxhealth, rgn), new Player(100, 75, 75, [10, 10], 4, 100, 0.001), new Player(100, 200, 200, [10, 10], 4, 100, 0.001));
 
 for (let n in players) {
     for (let count = 0; count < 360; count += 45) {
-        weapons.push(new Weapon(1, [10, 10], count, 0, 0, 3, n))
+        weapons.push(new Weapon(1, [10, 10], count, 0, 0, 3, n, 75, 75, 1))
     }
 };
 // Basic rectangular collision function I found on Stack because I was too lazy to make one myself.
@@ -201,7 +204,7 @@ requestAnimationFrame(function draw() {
         }
     };
     for (let coun in weapons) {
-        if (players[weapons[coun].target] !== undefined) {
+        if (players[weapons[coun].target] !== undefined && players[weapons[coun].target].health > 0) {
             let xr = players[weapons[coun].target].x + players[weapons[coun].target].model[0] / 2 - weapons[coun].model[0] / 2;
             let yr = players[weapons[coun].target].y + players[weapons[coun].target].model[1] / 2 - weapons[coun].model[1] / 2;
             weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + 5;
@@ -211,10 +214,16 @@ requestAnimationFrame(function draw() {
             weapons[coun].y = r[1];
             weapons[coun].rotation += weapons[coun].rotspeed;
             if (weapons[coun].rotation % 360 === 0) {
-                weapons[coun].rotation = 0
+                weapons[coun].rotation = 0;
             };
             ctx.fillStyle = '#ffe46b';
-            ctx.fillRect(weapons[coun].x, weapons[coun].y, weapons[coun].model[0], weapons[coun].model[1])
+            if (weapons[coun].health > 0) {
+                ctx.fillRect(weapons[coun].x, weapons[coun].y, weapons[coun].model[0], weapons[coun].model[1])
+            } else {
+                setTimeout(() => {
+                    weapons[coun].health = weapons[coun].maxhealth
+                }, weapons[coun].recharge * 25)
+            }
         } else {
             weapons.splice(coun, 1)
         }
@@ -312,8 +321,11 @@ requestAnimationFrame(function draw() {
                 enemies[count].health += enemies[count].rgn
             };
             for (let coun in weapons) {
-                if (collision(weapons[coun].x, weapons[coun].y, enemies[count].xe, enemies[count].ye, weapons[coun].model[0], enemies[count].model[0], weapons[coun].model[1], enemies[count].model[1]) !== 'none') {
-                    enemies[count].health -= weapons[coun].dmg;
+                if (weapons[coun].health > 0) {
+                    if (collision(weapons[coun].x, weapons[coun].y, enemies[count].xe, enemies[count].ye, weapons[coun].model[0], enemies[count].model[0], weapons[coun].model[1], enemies[count].model[1]) !== 'none') {
+                        enemies[count].health -= weapons[coun].dmg;
+                        weapons[coun].health -= enemies[count].bdydmg;
+                    }
                 }
             };
             // Push in new enemy AI algorithms and designs here
@@ -333,7 +345,6 @@ requestAnimationFrame(function draw() {
                             ]);
                         }
                     };
-                    // Again, this if wrapper is not needed, but I just do it because I like it.
                     if (targets.length) {
                         let targ = targets.reduce((dist, dist2) => dist[1] < dist2[1] ? dist[0] : dist2[0]);
                         if (targ.length === 2) {
