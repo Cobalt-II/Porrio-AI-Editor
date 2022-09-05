@@ -217,11 +217,11 @@ requestAnimationFrame(function draw() {
                 weapons[coun].rotation = weapons[coun].rotation - 360
             };
             ctx.fillStyle = '#ffe46b';
-            if (weapons[coun].health > 0) {
+            if (weapons[coun].health > 0 && weapons[coun] !== undefined) {
                 ctx.fillRect(weapons[coun].x, weapons[coun].y, weapons[coun].model[0], weapons[coun].model[1])
             } else {
                 setTimeout(() => {
-                    weapons[coun].health = weapons[coun].maxhealth
+                weapons[coun].health = weapons[coun].maxhealth;
                 }, weapons[coun].recharge * 25)
             }
         } else {
