@@ -11,7 +11,7 @@ along with collisions too. There are 3 main classes which can be used to develop
  
  These 4 classes are all used at least once as an example of how to create them.
  
- The AI Editor's entire code (or currently 98.1% of it) is put into an HTML script, and all variables are public and editable from console. 
+ The AI Editor's entire code (or currently 98.4% of it) is put into an HTML script, and all variables are public and editable from console. 
 This allows you to edit existing data and push new data (such as instantiating new enemies), all from the console.
 Most of this stuff is detailed from comments within the code, and the project runs on localhost:3000.
 
