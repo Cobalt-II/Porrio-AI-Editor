@@ -1,5 +1,5 @@
 # AI-Editor
-Note: This project is very new (only two days old at the time I'm writing this), and I only posted it here a few hours ago. There may be a few odd bugs that I haven't seen. It would be appreciated if these were reported.
+Note: This project is very new, and there may be a few odd bugs that I haven't seen. It would be appreciated if these were reported.
 
 This is an attempt at a basic AI editor, which provides tools in a canvas sandbox. The models are *EXTREMELY* simple (just rectangles), however, you can make them more complicated 
 along with collisions too. There are 3 main classes which can be used to develop an AI from this:
