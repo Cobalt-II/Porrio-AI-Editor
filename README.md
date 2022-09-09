@@ -13,7 +13,7 @@ along with collisions too. There are 3 main classes which can be used to develop
 This allows you to edit existing data and push new data (such as instantiating new enemies), all from the console.
 Most of this stuff is detailed from comments within the code, and the project runs on localhost:3000.
 
- Also, if anyone wants to help work on this (which I would greatly appreciate, I haven't been able to since school started back up, please contact me on Discord. My tag is Occ#7585, and I would greatly appreciate anyone who would help with this)
+ Also, if anyone wants to help work on this (which I would greatly appreciate, I haven't been able to since school started back up [and there are still a few core things I haven't finished], got ahead and contact me or use pull requests)
  
  Continuing my last paragraph, here's a list of current things that I need/want in this:
  1. Camera movement. Right now, it's just a canvas that the player can move along. I want to make it more like a real io game and add a simplistic camera system to the canvas, which will make it more like an authentic io game.
