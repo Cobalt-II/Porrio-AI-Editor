@@ -42,7 +42,7 @@ class Enemy {
 /* Push new AI types with this, if you feel comfortable with an AI you can even put that AI 
 into its own seperate class instead of making it dependant on enemy class stats. 
 For a quick 2-second example I put together: 
-class Smasher {
+class M28 {
     constructor(rarity, health, fov, xe, ye, speed, model, bodydmg) {
         this.rarity = rarity;
         this.health = rarity * 100;
@@ -54,21 +54,10 @@ class Smasher {
         this.bodydmg = 1;
     }
 };                                                                               
-enemies.push(new Smasher(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
-the Smasher (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
-instead of making a Smasher through the enemy class. Dummy players come after.*/
-enemies.push(new Enemy('Smasher', 1000, 100, 100, 200, 0.75, [20, 20], 1, 1000, 0.01));
-let walls = [];
-// Generate some walls with the Wall class.
-class Wall {
-    constructor(xw, yw, w, h) {
-        this.xw = xw;
-        this.yw = yw;
-        this.width = w;
-        this.height = h;
-    }
-};
-walls.push(new Wall(50, 50, 50, 50));
+enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
+the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
+instead of making a M28 through the enemy class. Dummy players come after.*/
+enemies.push(new Enemy('M28', 200, 100, 100, 200, 0.6, [10], 1, 200, 0.01));
 var Keys = {
     up: false,
     down: false,
@@ -117,36 +106,43 @@ let maxhealth = hp;
 let rgn = 0.01;
 let ids = [];
 let id = 0;
+let rad = 10;
 /* game calculates by always pushing your player data first, so that it can refer in its 
 calculations to you as players[0] */
-players.push(new Player(hp, x, y, [w, h], body, maxhealth, rgn), new Player(100, 75, 75, [10, 10], 4, 100, 0.01), new Player(100, 200, 200, [10, 10], 4, 100, 0.01), new Player(100, 300, 300, [10, 10], 4, 100, 0.01));
+players.push(new Player(hp, x, y, [w], body, maxhealth, rgn), new Player(hp, 75, 75, [w], body, maxhealth, rgn));
 
 for (let n in players) {
     for (let count = 0; count < 360; count += 45) {
-        weapons.push(new Weapon(1, [10, 10], count, 0, 0, 3, n, 75, 75, 1))
+        weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 75, 1))
     };
     players[n].id = id;
     ids.push(id);
     id++;
 };
-// Basic rectangular collision function I found on Stack because I was too lazy to make one myself.
-function collision(a, b, c, d, aw, cw, bh, dh) {
-    let dx = (a + aw / 2) - (c + cw / 2);
-    let dy = (b + bh / 2) - (d + dh / 2);
-    let width = (aw + cw) / 2;
-    let height = (bh + dh) / 2;
-    let crossWidth = width * dy;
-    let crossHeight = height * dx;
-    let collisionn = 'none';
-    if (Math.abs(dx) <= width && Math.abs(dy) <= height) {
-        if (crossWidth > crossHeight) {
-            collisionn = (crossWidth > (-crossHeight)) ? 'bottom' : 'left';
-        } else {
-            collisionn = (crossWidth > -(crossHeight)) ? 'right' : 'top';
-        }
+
+function collision(x1, x2, y1, y2, r1, r2) {
+
+    let collisionn = 'none'
+    if (Math.hypot(x1 - x2, y1 - y2) < r1 + r2) {
+        collisionn = 'true'
     }
-    return (collisionn);
-};
+    return collisionn;
+}
+
+function dir(x1, y1, x2, y2) {
+    if (x1 < x2 && y1 < y2) {
+        return 'SE'
+    };
+    if (x1 > x2 && y1 < y2) {
+        return 'SW'
+    };
+    if (x1 < x2 && y1 > y2) {
+        return 'NE'
+    };
+    if (x1 > x2 && y1 > y2) {
+        return 'NW'
+    };
+}
 // Once again, credits to Stack for letting me be lazy and steal a rotation function that uses the rotation matrix.
 function rotate(cx, cy, x, y, angle) {
     var radians = (Math.PI / 180) * angle,
@@ -184,29 +180,49 @@ requestAnimationFrame(function draw() {
     if (Keys.right) {
         players[0].x += 1;
     }
-    if (players[0].x < 0) {
-        players[0].x = 0
+    if (players[0].x - players[0].model[0] < 0) {
+        players[0].x = players[0].model[0];
     };
     if (players[0].x > canvas.width - players[0].model[0]) {
         players[0].x = canvas.width - players[0].model[0]
     };
-    if (players[0].y < 0) {
-        players[0].y = 0
+    if (players[0].y - players[0].model[0] < 0) {
+        players[0].y = players[0].model[0]
     };
-    if (players[0].y > canvas.height - players[0].model[1]) {
-        players[0].y = canvas.height - players[0].model[1]
+    if (players[0].y > canvas.height - players[0].model[0]) {
+        players[0].y = canvas.height - players[0].model[0]
     };
     for (let count in players) {
         if (players[count].health > 0) {
             if (players[count].health < maxhealth) {
                 players[count].health += players[count].rgn;
                 ctx.fillStyle = 'black';
-                ctx.fillRect(players[count].x, players[count].y + players[count].model[1] + 5, players[count].model[0], 5);
+                ctx.fillRect(players[count].x - players[count].model[0] / 2, players[count].y + players[count].model[0] + 5, players[count].model[0], 5);
                 ctx.fillStyle = '#2AAA8A';
-                ctx.fillRect(players[count].x, players[count].y + players[count].model[1] + 5, (players[count].health / players[count].maxhealth) * players[count].model[0], 5);
+                ctx.fillRect(players[count].x - players[count].model[0] / 2, players[count].y + players[count].model[0] + 5, (players[count].health / players[count].maxhealth) * players[count].model[0], 5);
             };
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(players[count].x, players[count].y, players[count].model[0], players[count].model[1]);
+            ctx.fillStyle = '#ffe763';
+            ctx.beginPath();
+            ctx.arc(players[count].x, players[count].y, players[count].model[0], 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fill();
+            for (let coun in players) {
+                if (players[coun].health > 0) {
+                    if (count !== coun && collision(players[count].x, players[coun].x, players[count].y, players[coun].y, players[count].model[0], players[coun].model[0]) !== 'none') {
+                        let angle = Math.abs(Math.atan2(players[count].y - players[coun].y, players[count].x - players[coun].x));
+                        if (players[count].x < players[coun].x) {
+                            players[count].x -= Math.cos(angle)
+                        } else {
+                            players[count].x += Math.cos(angle);
+                        }
+                        if (players[count].y < players[coun].y) {
+                            players[count].y -= Math.sin(angle)
+                        } else {
+                            players[count].y += Math.sin(angle);
+                        }
+                    }
+                }
+            }
         } else {
             if (count !== 0) {
                 players.splice(count, 1);
@@ -221,10 +237,10 @@ requestAnimationFrame(function draw() {
     for (let coun in weapons) {
         if (players[weapons[coun].target] !== undefined && players[weapons[coun].target].health > 0) {
             let currid = players[weapons[coun].target].id;
-            let xr = players[weapons[coun].target].x + players[weapons[coun].target].model[0] / 2 - weapons[coun].model[0] / 2;
-            let yr = players[weapons[coun].target].y + players[weapons[coun].target].model[1] / 2 - weapons[coun].model[1] / 2;
-            weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + 5;
-            weapons[coun].y = yr + players[weapons[coun].target].model[1] / 2 + weapons[coun].model[1] + 5;
+            let xr = players[weapons[coun].target].x;
+            let yr = players[weapons[coun].target].y;
+            weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
+            weapons[coun].y = yr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
             let r = rotate(xr, yr, weapons[coun].x, weapons[coun].y, weapons[coun].rotation);
             weapons[coun].x = r[0];
             weapons[coun].y = r[1];
@@ -232,9 +248,12 @@ requestAnimationFrame(function draw() {
             if (weapons[coun].rotation >= 360) {
                 weapons[coun].rotation = weapons[coun].rotation - 360
             };
-            ctx.fillStyle = '#ffe46b';
+            ctx.fillStyle = '#F3F3F3';
             if (weapons[coun].health > 0 && weapons[coun] !== undefined) {
-                ctx.fillRect(weapons[coun].x, weapons[coun].y, weapons[coun].model[0], weapons[coun].model[1])
+                ctx.beginPath();
+                ctx.arc(weapons[coun].x, weapons[coun].y, weapons[coun].model[0], 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.fill();
             } else {
                 setTimeout(() => {
                     if (ids.indexOf(currid) !== -1) {
@@ -244,53 +263,10 @@ requestAnimationFrame(function draw() {
             }
         }
     };
-    // Seperate walls from nesting inside of enemies, because then walls will only exist when enemies exist.
-    for (let coun in walls) {
-        ctx.fillStyle = 'grey';
-        ctx.fillRect(walls[coun].xw, walls[coun].yw, walls[coun].width, walls[coun].height);
-        for (let n in players) {
-            let c = collision(players[n].x, players[n].y, walls[coun].xw, walls[coun].yw, players[n].model[0], walls[coun].width, players[n].model[1], walls[coun].height);
-            if (c !== 'none') {
-                switch (c) {
-                    case 'bottom':
-                        players[n].y += walls[coun].yw + walls[coun].height - players[n].y;
-                        break;
-                    case 'top':
-                        players[n].y -= players[n].y + players[n].model[1] - walls[coun].yw;
-                        break;
-                    case 'left':
-                        players[n].x -= players[n].x + players[n].model[0] - walls[coun].xw;;
-                        break;
-                    case 'right':
-                        players[n].x += walls[coun].xw + walls[coun].width - players[n].x;
-                        break;
-                }
-            };
-        }
-    };
+
     for (let count in enemies) {
-        for (let coun in walls) {
-            let d = collision(enemies[count].xe, enemies[count].ye, walls[coun].xw, walls[coun].yw, enemies[count].model[0], walls[coun].width, enemies[count].model[1], walls[coun].height);
-            // We don't really need to check for collision type 'none' here, but I still prefer it.
-            if (d !== 'none') {
-                switch (d) {
-                    case 'bottom':
-                        enemies[count].ye += walls[coun].yw + walls[coun].height - enemies[count].ye;
-                        break;
-                    case 'top':
-                        enemies[count].ye -= enemies[count].ye + enemies[count].model[1] - walls[coun].yw;
-                        break;
-                    case 'left':
-                        enemies[count].xe -= enemies[count].xe + enemies[count].model[0] - walls[coun].xw;
-                        break;
-                    case 'right':
-                        enemies[count].xe += walls[coun].xw + walls[coun].width - enemies[count].xe;
-                        break;
-                }
-            };
-        };
         // Shitty chase function I made
-        function chase(x, y, w, h) {
+        function chase(x, y, w) {
             if (x <= enemies[count].xe && y <= enemies[count].ye) {
                 enemies[count].xe -= enemies[count].speed;
                 enemies[count].ye -= enemies[count].speed;
@@ -313,10 +289,10 @@ requestAnimationFrame(function draw() {
             if (x >= enemies[count].xe - w && x <= enemies[count].xe + w && x > enemies[count].ye) {
                 enemies[count].ye += enemies[count].speed;
             };
-            if (x > enemies[count].xe && y >= enemies[count].ye - h && y <= enemies[count].ye + h) {
+            if (x > enemies[count].xe && y >= enemies[count].ye - w && y <= enemies[count].ye + w) {
                 enemies[count].xe += enemies[count].speed;
             };
-            if (x < enemies[count].xe && y >= enemies[count].ye - h && y <= enemies[count].ye + h) {
+            if (x < enemies[count].xe && y >= enemies[count].ye - w && y <= enemies[count].ye + w) {
                 enemies[count].xe -= enemies[count].speed;
             }
         };
@@ -329,49 +305,69 @@ requestAnimationFrame(function draw() {
         if (enemies[count].ye < 0) {
             enemies[count].ye = 0
         };
-        if (enemies[count].ye > canvas.height - enemies[count].model[1]) {
-            enemies[count].ye = canvas.height - enemies[count].model[1]
+        if (enemies[count].ye > canvas.height - enemies[count].model[0]) {
+            enemies[count].ye = canvas.height - enemies[count].model[0]
         };
         if (enemies[count].health > 0) {
             if (enemies[count].health < enemies[count].maxhealth) {
                 enemies[count].health += enemies[count].rgn;
                 ctx.fillStyle = 'black';
-                ctx.fillRect(enemies[count].xe, enemies[count].ye + enemies[count].model[1] + 5, enemies[count].model[0], 5);
+                ctx.fillRect(enemies[count].xe - enemies[count].model[0] / 2, enemies[count].ye + enemies[count].model[0] + 5, enemies[count].model[0], 5);
                 ctx.fillStyle = '#2AAA8A';
-                ctx.fillRect(enemies[count].xe, enemies[count].ye + enemies[count].model[1] + 5, (enemies[count].health / enemies[count].maxhealth) * enemies[count].model[0], 5);
+                ctx.fillRect(enemies[count].xe - enemies[count].model[0] / 2, enemies[count].ye + enemies[count].model[0] + 5, (enemies[count].health / enemies[count].maxhealth) * enemies[count].model[0], 5);
             };
             for (let coun in weapons) {
                 if (weapons[coun].health > 0) {
-                    if (collision(weapons[coun].x, weapons[coun].y, enemies[count].xe, enemies[count].ye, weapons[coun].model[0], enemies[count].model[0], weapons[coun].model[1], enemies[count].model[1]) !== 'none') {
-                        enemies[count].health -= weapons[coun].dmg;
-                        weapons[coun].health -= enemies[count].bdydmg;
+                    switch (enemies[count].type) {
+                        case 'M28':
+                            if (collision(weapons[coun].x, enemies[count].xe, weapons[coun].y, enemies[count].ye, weapons[coun].model[0], enemies[count].model[0]) !== 'none') {
+                                enemies[count].health -= weapons[coun].dmg;
+                                weapons[coun].health -= enemies[count].bdydmg;
+                                break;
+                            }
                     }
                 }
             };
+
             // Push in new enemy AI algorithms and designs here
             switch (enemies[count].type) {
-                case 'Smasher':
-                    ctx.fillStyle = 'red';
-                    ctx.fillRect(enemies[count].xe, enemies[count].ye, enemies[count].model[0], enemies[count].model[1]);
+                case 'M28':
+                    ctx.fillStyle = '#FDD7A4';
+                    ctx.beginPath();
+                    ctx.arc(enemies[count].xe, enemies[count].ye, enemies[count].model[0], 0, Math.PI * 2, true);
+                    ctx.closePath();
+                    ctx.fill();
                     let targets = [];
                     for (let coun in players) {
-                        if (collision(players[coun].x, players[coun].y, enemies[count].xe, enemies[count].ye, players[coun].model[0], enemies[count].model[0], players[coun].model[1], enemies[count].model[1]) !== 'none') {
+                        if (collision(players[coun].x, enemies[count].xe, players[coun].y, enemies[count].ye, players[coun].model[0], enemies[count].model[0]) !== 'none') {
                             players[coun].health -= enemies[count].bodydmg;
                             enemies[count].health -= players[coun].bodydmg;
+                            let angle = Math.abs(Math.atan2(players[coun].y - enemies[count].ye, players[coun].x - enemies[count].xe));
+                            console.log(angle);
+                            if (players[coun].x < enemies[count].xe) {
+                                players[coun].x -= Math.cos(angle) * enemies[count].speed + 1
+                            } else {
+                                players[coun].x += Math.cos(angle) * enemies[count].speed + 1;
+                            }
+                            if (players[coun].y < enemies[count].ye) {
+                                players[coun].y -= Math.sin(angle) * enemies[count].speed + 1
+                            } else {
+                                players[coun].y += Math.sin(angle) * enemies[count].speed + 1;
+                            }
                         };
                         if (Math.hypot(players[coun].x - enemies[count].xe, players[coun].y - enemies[count].ye) < enemies[count].fov) {
                             targets.push([
-                                [players[coun].x, players[coun].y, players[coun].model[0], players[coun].model[1]], Math.hypot(players[coun].x - enemies[count].xe, players[coun].y - enemies[count].ye)
+                                [players[coun].x, players[coun].y, players[coun].model[0]], Math.hypot(players[coun].x - enemies[count].xe, players[coun].y - enemies[count].ye)
                             ]);
                         }
                     };
                     if (targets.length) {
                         let targ = targets.reduce((dist, dist2) => dist[1] < dist2[1] ? dist[0] : dist2[0]);
                         if (targ.length === 2) {
-                            chase(targ[0][0], targ[0][1], targ[0][2], targ[0][3])
+                            chase(targ[0][0], targ[0][1], targ[0][2])
                         }
-                        if (targ.length === 4) {
-                            chase(targ[0], targ[1], targ[2], targ[3])
+                        if (targ.length === 3) {
+                            chase(targ[0], targ[1], targ[2])
                         }
                     };
                     break;
