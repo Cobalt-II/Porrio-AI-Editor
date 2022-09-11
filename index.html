@@ -10,10 +10,10 @@
      </style>
    </head>
   <body>
-    <canvas id="myCanvas" style="border:1px solid #000000;">
+    <canvas id="canvas" style="border:1px solid #000000;">
     </canvas>
 <script>
-let canvas = document.getElementById('myCanvas');
+let canvas = document.getElementById('canvas');
 var ctx = canvas.getContext("2d");
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
@@ -343,7 +343,6 @@ requestAnimationFrame(function draw() {
                             players[coun].health -= enemies[count].bodydmg;
                             enemies[count].health -= players[coun].bodydmg;
                             let angle = Math.abs(Math.atan2(players[coun].y - enemies[count].ye, players[coun].x - enemies[count].xe));
-                            console.log(angle);
                             if (players[coun].x < enemies[count].xe) {
                                 players[coun].x -= Math.cos(angle) * enemies[count].speed + 1
                             } else {
