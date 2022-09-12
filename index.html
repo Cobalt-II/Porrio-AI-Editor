@@ -180,19 +180,19 @@ requestAnimationFrame(function draw() {
     if (Keys.right) {
         players[0].x += 1;
     }
-    if (players[0].x - players[0].model[0] < 0) {
-        players[0].x = players[0].model[0];
-    };
-    if (players[0].x > canvas.width - players[0].model[0]) {
-        players[0].x = canvas.width - players[0].model[0]
-    };
-    if (players[0].y - players[0].model[0] < 0) {
-        players[0].y = players[0].model[0]
-    };
-    if (players[0].y > canvas.height - players[0].model[0]) {
-        players[0].y = canvas.height - players[0].model[0]
-    };
     for (let count in players) {
+    if (players[count].x - players[count].model[0] < 0) {
+        players[count].x = players[count].model[0];
+    };
+    if (players[count].x > canvas.width - players[count].model[0]) {
+        players[count].x = canvas.width - players[count].model[0]
+    };
+    if (players[count].y - players[count].model[0] < 0) {
+        players[count].y = players[count].model[0]
+    };
+    if (players[count].y > canvas.height - players[count].model[0]) {
+        players[count].y = canvas.height - players[count].model[0]
+    };
         if (players[count].health > 0) {
             if (players[count].health < maxhealth) {
                 players[count].health += players[count].rgn;
