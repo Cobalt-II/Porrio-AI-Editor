@@ -129,20 +129,6 @@ function collision(x1, x2, y1, y2, r1, r2) {
     return collisionn;
 }
 
-function dir(x1, y1, x2, y2) {
-    if (x1 < x2 && y1 < y2) {
-        return 'SE'
-    };
-    if (x1 > x2 && y1 < y2) {
-        return 'SW'
-    };
-    if (x1 < x2 && y1 > y2) {
-        return 'NE'
-    };
-    if (x1 > x2 && y1 > y2) {
-        return 'NW'
-    };
-}
 // Once again, credits to Stack for letting me be lazy and steal a rotation function that uses the rotation matrix.
 function rotate(cx, cy, x, y, angle) {
     var radians = (Math.PI / 180) * angle,
