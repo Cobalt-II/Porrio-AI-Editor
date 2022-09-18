@@ -23,11 +23,10 @@ ctx.fillStyle = "green";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 /*Type is a name string, health is a health value, fov is a range for the enemy to notice a player at,
 xe and ye are the spawn coordinates, speed is well, enemy speed per frame, model is used for dimensions of a 
-simple shape model, like a square for instance, and bodydmg is how much health is drained from collision per frame. Toggle is used as a toggle method
-for my Tornado enemy. It controls the time until next movement.
+simple shape model, like a square for instance, and bodydmg is how much health is drained from collision per frame. moveinterval is used as a timed burst of movement method.
 */
 class Enemy {
-    constructor(type, health, fov, xe, ye, speed, model, bodydmg, rgn, toggle) {
+    constructor(type, health, fov, xe, ye, speed, model, bodydmg, rgn, moveinterval) {
         this.type = type;
         this.health = health;
         this.fov = fov;
@@ -38,7 +37,7 @@ class Enemy {
         this.bodydmg = bodydmg;
         this.maxhealth = health;
         this.rgn = rgn;
-        this.toggle = toggle;
+        this.moveinterval = moveinterval;
         this.id = null;
     }
 };
@@ -401,7 +400,7 @@ requestAnimationFrame(function draw() {
                         let dirs2 = [-1, 1];
                         let s = setTimeout(() => {
                             if (eids.indexOf(curid) !== -1) {
-                                if (enemies[count].toggle === true) {
+                                if (enemies[count].moveinterval === true) {
                                     let e = Math.random();
                                     let d = dirs[Math.floor(Math.random() * dirs.length)];
                                     let c = dirs[Math.floor(Math.random() * dirs.length)];
@@ -436,10 +435,10 @@ requestAnimationFrame(function draw() {
                                             clearInterval(inter);
                                         }
                                     }, 10);
-                                    enemies[count].toggle = !enemies[count].toggle;
+                                    enemies[count].moveinterval = !enemies[count].moveinterval;
                                     let o = setTimeout(() => {
                                         if (eids.indexOf(curid) !== -1) {
-                                            enemies[count].toggle = !enemies[count].toggle
+                                            enemies[count].moveinterval = !enemies[count].moveinterval
                                         } else {
                                             clearTimeout(o)
                                         }
