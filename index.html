@@ -27,7 +27,7 @@ simple shape model, like a square for instance, and bodydmg is how much health i
 for my Tornado enemy. It controls the time until next movement.
 */
 class Enemy {
-    constructor(type, health, fov, xe, ye, speed, model, bodydmg, maxhealth, rgn, toggle) {
+    constructor(type, health, fov, xe, ye, speed, model, bodydmg, rgn, toggle) {
         this.type = type;
         this.health = health;
         this.fov = fov;
@@ -60,7 +60,7 @@ class M28 {
 enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
 the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
 instead of making a M28 through the enemy class. Dummy players come after.*/
-enemies.push(new Enemy('Tornado', 2000, 200, 200, 200, 0.6, [22.5], 1, 2000, 0.01, true));
+enemies.push(new Enemy('Tornado', 2000, 200, 200, 200, 0.6, [22.5], 1, 0.01, true));
 let eids = [];
 let eid = 0;
 var Keys = {
@@ -90,7 +90,7 @@ class Weapon {
 /* Added this so you can test enemy targetting on multiple players, these don't move or anything (except for yours), 
 they're just a testing default */
 class Player {
-    constructor(health, x, y, model, bodydmg, maxhealth, rgn) {
+    constructor(health, x, y, model, bodydmg, rgn) {
         this.health = health;
         this.x = x;
         this.y = y;
@@ -107,18 +107,17 @@ let w = 10;
 let h = 10;
 let body = 4;
 let hp = 100;
-let maxhealth = hp;
 let rgn = 0.01;
 let ids = [];
 let id = 0;
 let rad = 10;
 /* game calculates by always pushing your player data first, so that it can refer in its 
 calculations to you as players[0] */
-players.push(new Player(hp, x, y, [w], body, maxhealth, rgn), new Player(hp, 75, 75, [w], body, maxhealth, rgn));
+players.push(new Player(hp, x, y, [w], body, rgn), new Player(hp, 75, 75, [w], body, rgn));
 
 for (let n in players) {
     for (let count = 0; count < 360; count += 45) {
-        weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 75, 1))
+        weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 1))
     };
 
 };
@@ -188,7 +187,7 @@ requestAnimationFrame(function draw() {
             players[count].y = canvas.height - players[count].model[0]
         };
         if (players[count].health > 0) {
-            if (players[count].health < maxhealth) {
+            if (players[count].health < players[count].maxhealth) {
                 players[count].health += players[count].rgn;
                 ctx.fillStyle = 'black';
                 ctx.fillRect(players[count].x - players[count].model[0] / 2, players[count].y + players[count].model[0] + 5, players[count].model[0], 5);
