@@ -39,6 +39,7 @@ class Enemy {
         this.maxhealth = health;
         this.rgn = rgn;
         this.toggle = toggle;
+        this.id = null;
     }
 };
 /* Push new AI types with this, if you feel comfortable with an AI you can even put that AI 
@@ -60,7 +61,8 @@ enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one o
 the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
 instead of making a M28 through the enemy class. Dummy players come after.*/
 enemies.push(new Enemy('Tornado', 2000, 200, 200, 200, 0.6, [22.5], 1, 2000, 0.01, true));
-
+let eids = [];
+let eid = 0;
 var Keys = {
     up: false,
     down: false,
@@ -88,7 +90,7 @@ class Weapon {
 /* Added this so you can test enemy targetting on multiple players, these don't move or anything (except for yours), 
 they're just a testing default */
 class Player {
-    constructor(health, x, y, model, bodydmg, maxhealth, rgn, id) {
+    constructor(health, x, y, model, bodydmg, maxhealth, rgn) {
         this.health = health;
         this.x = x;
         this.y = y;
@@ -96,7 +98,7 @@ class Player {
         this.bodydmg = bodydmg;
         this.maxhealth = health;
         this.rgn = rgn;
-        this.id = id;
+        this.id = null;
     }
 };
 let x = 0;
@@ -118,9 +120,7 @@ for (let n in players) {
     for (let count = 0; count < 360; count += 45) {
         weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 75, 1))
     };
-    players[n].id = id;
-    ids.push(id);
-    id++;
+
 };
 
 function collision(x1, x2, y1, y2, r1, r2) {
@@ -170,6 +170,11 @@ requestAnimationFrame(function draw() {
         players[0].x += 1;
     }
     for (let count in players) {
+        if (players[count].id === null) {
+            players[count].id = id;
+            ids.push(id);
+            id++;
+        };
         if (players[count].x - players[count].model[0] < 0) {
             players[count].x = players[count].model[0];
         };
@@ -244,9 +249,11 @@ requestAnimationFrame(function draw() {
                 ctx.closePath();
                 ctx.fill();
             } else {
-                setTimeout(() => {
+                let j = setTimeout(() => {
                     if (ids.indexOf(currid) !== -1) {
                         weapons[coun].health = weapons[coun].maxhealth
+                    } else {
+                        clearTimeout(j)
                     };
                 }, weapons[coun].recharge * 25)
             }
@@ -254,6 +261,12 @@ requestAnimationFrame(function draw() {
     };
 
     for (let count in enemies) {
+        if (enemies[count].id === null) {
+            enemies[count].id = eid;
+            eids.push(eid);
+            eid++;
+        }
+        let curid = enemies[count].id;
         // Shitty chase function I made
         function chase(x, y, w) {
             if (x <= enemies[count].xe && y <= enemies[count].ye) {
@@ -377,42 +390,54 @@ requestAnimationFrame(function draw() {
                         };
                         let dirs = [-1, 0, 1];
                         let dirs2 = [-1, 1];
-                        setTimeout(() => {
-                            if (enemies[count].toggle === true) {
-                                let e = Math.random();
-                                let d = dirs[Math.floor(Math.random() * dirs.length)];
-                                let c = dirs[Math.floor(Math.random() * dirs.length)];
-                                let reps = 0;
-                                let inter = setInterval(() => {
-                                    if (reps < 40) {
-                                        if (d !== 0 || c !== 0) {
-                                            enemies[count].xe += d;
-                                            enemies[count].ye += c;
-                                            reps++;
-                                        } else {
-                                            if (e < 1 / 3) {
-                                                d = dirs2[Math.floor(Math.random() * dirs2.length)];
-                                            } else {
-                                                if (e < 2 / 3) {
-                                                    c = dirs2[Math.floor(Math.random() * dirs2.length)];
+                        let s = setTimeout(() => {
+                            if (eids.indexOf(curid) !== -1) {
+                                if (enemies[count].toggle === true) {
+                                    let e = Math.random();
+                                    let d = dirs[Math.floor(Math.random() * dirs.length)];
+                                    let c = dirs[Math.floor(Math.random() * dirs.length)];
+                                    let reps = 0;
+                                    let inter = setInterval(() => {
+                                        if (eids.indexOf(curid) !== -1) {
+                                            if (reps < 40) {
+                                                if (d !== 0 || c !== 0) {
                                                     enemies[count].xe += d;
                                                     enemies[count].ye += c;
                                                     reps++;
                                                 } else {
-                                                    c = dirs2[Math.floor(Math.random() * dirs2.length)];
-                                                    d = dirs2[Math.floor(Math.random() * dirs2.length)];
-                                                    enemies[count].xe += d;
-                                                    enemies[count].ye += c;
-                                                    reps++;
+                                                    if (e < 1 / 3) {
+                                                        d = dirs2[Math.floor(Math.random() * dirs2.length)];
+                                                    } else {
+                                                        if (e < 2 / 3) {
+                                                            c = dirs2[Math.floor(Math.random() * dirs2.length)];
+                                                            enemies[count].xe += d;
+                                                            enemies[count].ye += c;
+                                                            reps++;
+                                                        } else {
+                                                            c = dirs2[Math.floor(Math.random() * dirs2.length)];
+                                                            d = dirs2[Math.floor(Math.random() * dirs2.length)];
+                                                            enemies[count].xe += d;
+                                                            enemies[count].ye += c;
+                                                            reps++;
+                                                        }
+                                                    }
                                                 }
-                                            }
+                                            } else clearInterval(inter)
+                                        } else {
+                                            clearInterval(inter)
                                         }
-                                    } else clearInterval(inter)
-                                }, 10);
-                                enemies[count].toggle = !enemies[count].toggle;
-                                setTimeout(() => {
-                                    enemies[count].toggle = !enemies[count].toggle
-                                }, 500)
+                                    }, 10);
+                                    enemies[count].toggle = !enemies[count].toggle;
+                                    let o = setTimeout(() => {
+                                        if (eids.indexOf(curid) !== -1) {
+                                            enemies[count].toggle = !enemies[count].toggle
+                                        } else {
+                                            clearTimeout(o)
+                                        }
+                                    }, 500)
+                                }
+                            } else {
+                                clearTimeout(s)
                             }
                         }, 500)
 
@@ -435,7 +460,8 @@ requestAnimationFrame(function draw() {
                     break;
             }
         } else {
-            enemies.splice(count, 1)
+            enemies.splice(count, 1);
+            eids.splice(count, 1);
         }; // Deletes dead enemies
     };
     // If you die it just automatically resets you. 
