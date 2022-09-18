@@ -60,7 +60,7 @@ class M28 {
 enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
 the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
 instead of making a M28 through the enemy class. Dummy players come after.*/
-enemies.push(new Enemy('Tornado', 2000, 200, 200, 200, 0.6, [22.5], 1, 0.01, true));
+enemies.push(new Enemy('Tornado', 10000, 200, 200, 200, 0.6, [50], 1, 0.01, true));
 let eids = [];
 let eid = 0;
 var Keys = {
@@ -111,13 +111,15 @@ let rgn = 0.01;
 let ids = [];
 let id = 0;
 let rad = 10;
+let controls = [];
+let int;
 /* game calculates by always pushing your player data first, so that it can refer in its 
 calculations to you as players[0] */
 players.push(new Player(hp, x, y, [w], body, rgn), new Player(hp, 75, 75, [w], body, rgn));
 
 for (let n in players) {
     for (let count = 0; count < 360; count += 45) {
-        weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 1))
+        weapons.push(new Weapon(10, [5], count, 0, 0, 3, n, 75, 2.5))
     };
 
 };
@@ -147,6 +149,9 @@ function update() {
 };
 
 requestAnimationFrame(function draw() {
+    canvas.oncontextmenu = function(e) {
+        e.preventDefault();
+    };
     if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
         update();
     };
@@ -232,8 +237,13 @@ requestAnimationFrame(function draw() {
             let currid = players[weapons[coun].target].id;
             let xr = players[weapons[coun].target].x;
             let yr = players[weapons[coun].target].y;
-            weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
-            weapons[coun].y = yr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
+            if (parseInt(weapons[coun].target) === 0) {
+                weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
+                weapons[coun].y = yr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + rad;
+            } else {
+                weapons[coun].x = xr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + 10;
+                weapons[coun].y = yr + players[weapons[coun].target].model[0] / 2 + weapons[coun].model[0] + 10;
+            };
             let r = rotate(xr, yr, weapons[coun].x, weapons[coun].y, weapons[coun].rotation);
             weapons[coun].x = r[0];
             weapons[coun].y = r[1];
@@ -254,7 +264,7 @@ requestAnimationFrame(function draw() {
                     } else {
                         clearTimeout(j)
                     };
-                }, weapons[coun].recharge * 25)
+                }, weapons[coun].recharge * 1000)
             }
         }
     };
@@ -323,7 +333,7 @@ requestAnimationFrame(function draw() {
                 if (weapons[coun].health > 0) {
                     if (collision(weapons[coun].x, enemies[count].xe, weapons[coun].y, enemies[count].ye, weapons[coun].model[0], enemies[count].model[0]) !== 'none') {
                         enemies[count].health -= weapons[coun].dmg;
-                        weapons[coun].health -= enemies[count].bdydmg;
+                        weapons[coun].health -= enemies[count].bodydmg;
                     }
                 }
             };
@@ -355,12 +365,12 @@ requestAnimationFrame(function draw() {
                     ctx.fill();
                     ctx.fillStyle = '#797979';
                     ctx.beginPath();
-                    ctx.arc(r2[0], r2[1], enemies[count].model[0] - 7.5, 0, Math.PI * 2, true);
+                    ctx.arc(r2[0], r2[1], enemies[count].model[0] - enemies[count].model[0] / 3, 0, Math.PI * 2, true);
                     ctx.closePath();
                     ctx.fill();
                     ctx.fillStyle = '#959595';
                     ctx.beginPath();
-                    ctx.arc(r1[0], r1[1], enemies[count].model[0] - 15, 0, Math.PI * 2, true);
+                    ctx.arc(r1[0], r1[1], enemies[count].model[0] - enemies[count].model[0] / 3 * 2, 0, Math.PI * 2, true);
                     ctx.closePath();
                     ctx.fill();
 
@@ -421,9 +431,9 @@ requestAnimationFrame(function draw() {
                                                         }
                                                     }
                                                 }
-                                            } else clearInterval(inter)
+                                            } else clearInterval(inter);
                                         } else {
-                                            clearInterval(inter)
+                                            clearInterval(inter);
                                         }
                                     }, 10);
                                     enemies[count].toggle = !enemies[count].toggle;
@@ -505,6 +515,51 @@ document.onkeyup = function(e) {
             Keys.down = false;
             break;
     }
+};
+document.onmousedown = function(e) {
+    if (e.which === 1 || e.which === 3) {
+        for (let count in controls) {
+            clearInterval(controls[count])
+        }
+    };
+    switch (e.which) {
+        case 1:
+            int = setInterval(() => {
+                if (rad < 20) {
+                    rad += 0.5
+                } else {
+                    clearInterval(int)
+                }
+            }, 10);
+            controls.push(int);
+            break;
+        case 3:
+            int = setInterval(() => {
+                if (rad > 2.5) {
+                    rad -= 0.5
+                } else {
+                    clearInterval(int)
+                }
+            }, 10);
+            controls.push(int);
+    }
+};
+document.onmouseup = function(e) {
+    for (let count in controls) {
+        clearInterval(controls[count])
+    }
+    int = setInterval(() => {
+        if (rad > 10) {
+            rad -= 0.5
+        };
+        if (rad < 10) {
+            rad += 0.5
+        };
+        if (rad === 10) {
+            clearInterval(int)
+        }
+    }, 10);
+    controls.push(int);
 };
 </script>
   </body>
