@@ -59,9 +59,8 @@ class M28 {
 enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
 the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
 instead of making a M28 through the enemy class. Dummy players come after.*/
-setInterval(() => {
-    enemies.push(new Enemy('Tornado', 2000, 100, 100, 200, 0.6, [22.5], 1, 2000, 0.01, true));
-}, 1000);
+enemies.push(new Enemy('Tornado', 2000, 200, 200, 200, 0.6, [22.5], 1, 2000, 0.01, true));
+
 var Keys = {
     up: false,
     down: false,
@@ -356,7 +355,7 @@ requestAnimationFrame(function draw() {
                     let targets = [];
                     for (let coun in players) {
                         let v = Math.hypot(players[coun].x - enemies[count].xe, players[coun].y - enemies[count].ye);
-                        if (v < 100) {
+                        if (v < 200) {
                             let n = rotate(enemies[count].xe, enemies[count].ye, players[coun].x, players[coun].y, (v * 100 / v) / 50);
                             players[coun].x = n[0];
                             players[coun].y = n[1]
