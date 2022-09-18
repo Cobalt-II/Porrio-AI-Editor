@@ -518,7 +518,8 @@ document.onkeyup = function(e) {
 document.onmousedown = function(e) {
     if (e.which === 1 || e.which === 3) {
         for (let count in controls) {
-            clearInterval(controls[count])
+            clearInterval(controls[count]);
+            controls.splice(count, 1);
         }
     };
     switch (e.which) {
@@ -527,7 +528,7 @@ document.onmousedown = function(e) {
                 if (rad < 20) {
                     rad += 0.5
                 } else {
-                    clearInterval(int)
+                    clearInterval(int);
                 }
             }, 10);
             controls.push(int);
@@ -537,7 +538,7 @@ document.onmousedown = function(e) {
                 if (rad > 2.5) {
                     rad -= 0.5
                 } else {
-                    clearInterval(int)
+                    clearInterval(int);
                 }
             }, 10);
             controls.push(int);
@@ -545,7 +546,8 @@ document.onmousedown = function(e) {
 };
 document.onmouseup = function(e) {
     for (let count in controls) {
-        clearInterval(controls[count])
+        clearInterval(controls[count]);
+        controls.splice(count, 1);
     }
     int = setInterval(() => {
         if (rad > 10) {
