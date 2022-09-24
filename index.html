@@ -14,7 +14,7 @@
     </canvas>
 <script>
 let canvas = document.getElementById('canvas');
-var ctx = canvas.getContext("2d");
+let ctx = canvas.getContext("2d");
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 let players = [];
@@ -110,7 +110,6 @@ let rgn = 0.01;
 let ids = [];
 let id = 0;
 let rad = 10;
-let controls = [];
 let int;
 /* game calculates by always pushing your player data first, so that it can refer in its 
 calculations to you as players[0] */
@@ -517,38 +516,36 @@ document.onkeyup = function(e) {
 };
 document.onmousedown = function(e) {
     if (e.which === 1 || e.which === 3) {
-        for (let count in controls) {
-            clearInterval(controls[count]);
-            controls.splice(count, 1);
+
+        clearInterval(int);
+
+        switch (e.which) {
+            case 1:
+                int = setInterval(() => {
+                    if (rad < 20) {
+                        rad += 0.5
+                    } else {
+                        clearInterval(int);
+                    }
+                }, 10);
+
+                break;
+            case 3:
+                int = setInterval(() => {
+                    if (rad > 2.5) {
+                        rad -= 0.5
+                    } else {
+                        clearInterval(int);
+                    }
+                }, 10);
+
         }
-    };
-    switch (e.which) {
-        case 1:
-            int = setInterval(() => {
-                if (rad < 20) {
-                    rad += 0.5
-                } else {
-                    clearInterval(int);
-                }
-            }, 10);
-            controls.push(int);
-            break;
-        case 3:
-            int = setInterval(() => {
-                if (rad > 2.5) {
-                    rad -= 0.5
-                } else {
-                    clearInterval(int);
-                }
-            }, 10);
-            controls.push(int);
     }
 };
 document.onmouseup = function(e) {
-    for (let count in controls) {
-        clearInterval(controls[count]);
-        controls.splice(count, 1);
-    }
+
+    clearInterval(int);
+
     int = setInterval(() => {
         if (rad > 10) {
             rad -= 0.5
@@ -560,7 +557,7 @@ document.onmouseup = function(e) {
             clearInterval(int)
         }
     }, 10);
-    controls.push(int);
+
 };
 </script>
   </body>
