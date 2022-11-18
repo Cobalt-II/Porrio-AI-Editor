@@ -21,10 +21,7 @@ let players = [];
 let enemies = [];
 ctx.fillStyle = "green";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
-/*Type is a name string, health is a health value, fov is a range for the enemy to notice a player at,
-xe and ye are the spawn coordinates, speed is well, enemy speed per frame, model is used for dimensions of a 
-simple shape model, like a square for instance, and bodydmg is how much health is drained from collision per frame. moveinterval is used as a timed burst of movement method.
-*/
+
 class Enemy {
     constructor(type, health, fov, xe, ye, speed, model, bodydmg, rgn, moveinterval) {
         this.type = type;
@@ -41,24 +38,7 @@ class Enemy {
         this.id = null;
     }
 };
-/* Push new AI types with this, if you feel comfortable with an AI you can even put that AI 
-into its own seperate class instead of making it dependant on enemy class stats. 
-For a quick 2-second example I put together: 
-class M28 {
-    constructor(rarity, health, fov, xe, ye, speed, model, bodydmg) {
-        this.rarity = rarity;
-        this.health = rarity * 100;
-        this.fov = fov * (rarity / 2);
-        this.xe = xe;
-        this.ye = ye;
-        this.speed = 1;
-        this.model = [5,5];
-        this.bodydmg = 1;
-    }
-};                                                                               
-enemies.push(new M28(5,100,100,50,50,1,[5,5],1)); here, I made a class for one of my example enemy AI types, 
-the M28 (I also added in a rarity example, so like if you wanted rarer and stronger enemy versions you could),
-instead of making a M28 through the enemy class. Dummy players come after.*/
+
 enemies.push(new Enemy('Tornado', 10000, 200, 200, 200, 0.6, [50], 1, 0.01, true));
 let eids = [];
 let eid = 0;
@@ -68,6 +48,7 @@ var Keys = {
     left: false,
     right: false
 };
+
 /* Basic weapon system I added. It just rotates a weapon model around the player. If you wish for a different system, 
 you can make your own too. Damage is weapon body damage, model is model, rotation is rotation angle, x and y are dummy variables, you can put whatever for them,
 rotspeed is the rotational speed, and target is the players[target] that you want to the weapon to apply to. */
@@ -220,7 +201,7 @@ requestAnimationFrame(function draw() {
                 }
             }
         } else {
-            if (count !== 0) {
+            if (count) {
                 players.splice(count, 1);
                 ids.splice(count, 1);
                 weapons.splice(count * 8, 8);
@@ -407,7 +388,7 @@ requestAnimationFrame(function draw() {
                                     let inter = setInterval(() => {
                                         if (eids.indexOf(curid) !== -1) {
                                             if (reps < 40) {
-                                                if (d !== 0 || c !== 0) {
+                                                if (d || c) {
                                                     enemies[count].xe += d;
                                                     enemies[count].ye += c;
                                                     reps++;
